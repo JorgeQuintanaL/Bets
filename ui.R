@@ -1,4 +1,4 @@
-dashboardPage(
+ui <- dashboardPage(
   dashboardHeader(title = "Testing Data Extraction"),
   dashboardSidebar(
     sidebarMenu(
@@ -11,16 +11,28 @@ dashboardPage(
       tabItem(tabName = "estadisticas",
               fluidRow(
                 box(
-                  selectInput(inputId = "region", label = "Region", choices = c( "All", unique(Data["Region"])), selected = "All")
+                  selectInput(inputId = "region", label = "Region", choices = c("All", unique(Data["Region"])), selected = "All")
+                ),
+                box(
+                  selectInput(inputId = "pais", label = "Pais", choices = c("All", "A"), selected = "All")
                 )
               ),
               fluidRow(
-                box(width = 6, height = 650,
+                box(width = 6,
+                    height = 650,
                     title = "Ligas por pais",
                     solidHeader = TRUE, br(),
                     plotOutput("plot1", height = 550, width = 750),
-                    collapsible = TRUE, status = "primary"
-                )
+                    collapsible = TRUE,
+                    status = "primary"
+                ),
+                box(width = 6,
+                    height = 650,
+                    DTOutput(outputId = "countries"),
+                    title = "Lista",
+                    collapsible = TRUE,
+                    status = "primary",
+                    solidHeader = TRUE)
               )
       ),
       tabItem(tabName = "resultados",

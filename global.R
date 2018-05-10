@@ -7,6 +7,7 @@ library("anytime")
 library("tidyr")
 library("ggplot2")
 library("ggmap")
+library("DT")
 
 setwd("~/Documents/eOddsMaker/app")
 

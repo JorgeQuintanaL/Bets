@@ -1,4 +1,4 @@
-server <- function(input, output) 
+server <- function(session, input, output) 
 {
   Data_ <- reactive(
     {
@@ -30,6 +30,16 @@ server <- function(input, output)
              caption = "") +
         scale_fill_brewer(palette = "Spectral", name = "")
       # theme_bw()
+    }
+  )
+  
+  output$countries <- DT::renderDataTable(
+    Data_(),
+    options = list(pageLength = 8, scrollX = TRUE, scrollY = "480px", columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+  
+  observe(
+    {
+      updateSelectInput(session = session, inputId = "pais", choices = c("All", unique(Data_()[["Country_Name"]])), selected = "All")
     }
   )
 }
