@@ -9,7 +9,7 @@ library("ggplot2")
 library("ggmap")
 library("DT")
 
-setwd("~/Documents/eOddsMaker/app")
+# setwd("~/Documents/eOddsMaker/app")
 
 # user <- "jorge.quintana.l"
 # pwd <- "jorge.quintana.l"
@@ -39,3 +39,15 @@ JSON_stream$S[[1]] %>%
   left_join(x = .,
             y = Regions,
             by = "Country_Name") -> Data
+
+df2 <- read.delim(file = "world_codes.csv", header = TRUE, sep = ",", dec = ".", stringsAsFactors = FALSE)
+WorldData <- map_data("world")
+WorldData %>% 
+  filter(region != "Antarctica") -> WorldData
+
+Data %>%
+  group_by(Country_Name) %>%
+  summarise(Reports = n()) %>%
+  left_join(x = .,
+            y = df2,
+            by = "Country_Name") -> df2

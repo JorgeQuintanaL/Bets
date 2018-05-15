@@ -22,7 +22,7 @@ ui <- dashboardPage(
                     height = 650,
                     title = "Eventos por Region",
                     solidHeader = TRUE, br(),
-                    plotOutput("plot1", height = 550, width = 750),
+                    plotOutput("plot1", height = 550, width = 650),
                     collapsible = TRUE,
                     status = "primary"
                 ),
@@ -30,7 +30,7 @@ ui <- dashboardPage(
                     height = 650,
                     title = "Eventos por Pais",
                     solidHeader = TRUE, br(),
-                    plotOutput("plot2", height = 550, width = 750),
+                    plotOutput("plot2", height = 550, width = 650),
                     collapsible = TRUE,
                     status = "primary"
                 )
@@ -43,6 +43,22 @@ ui <- dashboardPage(
                     collapsible = TRUE,
                     status = "primary",
                     solidHeader = TRUE)
+              ),
+              fluidRow(
+                box(width = 6,
+                    height = 650,
+                    title = "Mapa",
+                    collapsible = TRUE,
+                    solidHeader = TRUE,
+                    status = "primary",
+                    plotlyOutput("map", width = 650, height = 520)),
+                box(width = 6,
+                    height = 650,
+                    title = "Mapa 2",
+                    collapsible = TRUE,
+                    solidHeader = TRUE,
+                    status = "primary",
+                    plotOutput("map2", width = 650, height = 520))
               )
       ),
       tabItem(tabName = "resultados",
