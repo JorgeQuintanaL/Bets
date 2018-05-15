@@ -22,14 +22,12 @@ server <- function(session, input, output)
         ggplot(., aes(x = Country_Name, y = Reports, fill = Region)) +
         geom_bar(stat = "identity") +
         theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "bottom") +
-        # coord_flip() +
         labs(title = "Reports by Region and Country",
              subtitle = "Using eOddsMaker API",
              x = "Country / Region",
              y = "Reports",
              caption = "") +
         scale_colour_hue()
-      # theme_bw()
     }
   )
   
@@ -43,14 +41,12 @@ server <- function(session, input, output)
         ggplot(., aes(x = League_Name, y = Reports, fill = League_Name)) +
         geom_bar(stat = "identity") +
         theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "bottom") +
-        # coord_flip() +
         labs(title = "Reports by Country and League",
              subtitle = "Using eOddsMaker API",
              x = "League",
              y = "Reports",
              caption = "") +
         scale_colour_hue()
-      # theme_bw()
     }
   )
   
@@ -67,43 +63,44 @@ server <- function(session, input, output)
         layout(title = "Eventos por Pais",
                geo = list(showframe = FALSE,
                           showcoastlines = TRUE,
+                          showland = TRUE,
+                          landcolor = toRGB("gray85"),
                           projection = list(type = "Mercator"),
                           lakecolor = toRGB("white")),
-               legend = list(orientation = "h"))
+               legend = list(orientation = "h"),
+               dragmode = "select")
     }
   )
   
-  # output$map2 <- renderPlot(
-  #   {
-  #     ggplot() +
-  #       geom_map(data = WorldData,
-  #                map = WorldData,
-  #                aes(x = long, y = lat, group = group, map_id = region),
-  #                fill = "white",
-  #                colour = "black",
-  #                size = 0.3) +
-  #       geom_map(data = df2,
-  #                map = WorldData,
-  #                aes(fill = Reports, map_id = Country_Name),
-  #                colour = "black",
-  #                size = 0.5) +
-  #       coord_map("rectangular",
-  #                 lat0 = 0,
-  #                 xlim = c(-180,180),
-  #                 ylim = c(-60, 90)) +
-  #       labs(fill = "Eventos", 
-  #            title = "Numero de Eventos por Pais",
-  #            x = "",
-  #            y="",
-  #            subtitle = "Actividad basada en Bookies",
-  #            caption = "Prueba") +
-  #       theme(legend.position = "right")
-  #   }
-  # )
+  selected_country <- reactive(
+    {
+      d <- event_data("plotly_click")
+      if (is.null(d))
+      {
+        return(NULL)
+      }
+      else
+      {
+        index <- as.numeric(d[2]$pointNumber) + 1
+        df2[row.names(df2) == index, "Country_Name"]
+      }
+    }
+  )
   
   output$countries <- DT::renderDataTable(
-    Data_() %>%
-      select(Sport_Name, Country_Name, League_Name, Event_Datetime, Round, Number_Bookies, Team1, Team2, BookMark_ID, Odd_Name, Odd_Value),
+    {
+      if (is.null(selected_country()))
+      {
+        Data_() %>%
+          select(Sport_Name, Country_Name, League_Name, Event_Datetime, Round, Number_Bookies, Team1, Team2, BookMark_ID, Odd_Name, Odd_Value)
+      }
+      else
+      {
+        Data_() %>%
+          select(Sport_Name, Country_Name, League_Name, Event_Datetime, Round, Number_Bookies, Team1, Team2, BookMark_ID, Odd_Name, Odd_Value) %>%
+          filter(Country_Name %in% selected_country())
+      }
+    },
     options = list(pageLength = 13, scrollX = TRUE, scrollY = "480px", columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
   
   observe(
