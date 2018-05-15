@@ -73,33 +73,33 @@ server <- function(session, input, output)
     }
   )
   
-  output$map2 <- renderPlot(
-    {
-      ggplot() +
-        geom_map(data = WorldData,
-                 map = WorldData,
-                 aes(x = long, y = lat, group = group, map_id = region),
-                 fill = "white",
-                 colour = "black",
-                 size = 0.3) +
-        geom_map(data = df2,
-                 map = WorldData,
-                 aes(fill = Reports, map_id = Country_Name),
-                 colour = "black",
-                 size = 0.5) +
-        coord_map("rectangular",
-                  lat0 = 0,
-                  xlim = c(-180,180),
-                  ylim = c(-60, 90)) +
-        labs(fill = "Eventos", 
-             title = "Numero de Eventos por Pais",
-             x = "",
-             y="",
-             subtitle = "Actividad basada en Bookies",
-             caption = "Prueba") +
-        theme(legend.position = "right")
-    }
-  )
+  # output$map2 <- renderPlot(
+  #   {
+  #     ggplot() +
+  #       geom_map(data = WorldData,
+  #                map = WorldData,
+  #                aes(x = long, y = lat, group = group, map_id = region),
+  #                fill = "white",
+  #                colour = "black",
+  #                size = 0.3) +
+  #       geom_map(data = df2,
+  #                map = WorldData,
+  #                aes(fill = Reports, map_id = Country_Name),
+  #                colour = "black",
+  #                size = 0.5) +
+  #       coord_map("rectangular",
+  #                 lat0 = 0,
+  #                 xlim = c(-180,180),
+  #                 ylim = c(-60, 90)) +
+  #       labs(fill = "Eventos", 
+  #            title = "Numero de Eventos por Pais",
+  #            x = "",
+  #            y="",
+  #            subtitle = "Actividad basada en Bookies",
+  #            caption = "Prueba") +
+  #       theme(legend.position = "right")
+  #   }
+  # )
   
   output$countries <- DT::renderDataTable(
     Data_() %>%
