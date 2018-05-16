@@ -1,5 +1,22 @@
 server <- function(session, input, output) 
 {
+  user <- reactive(
+    {
+      curUser <- session$user
+      if (is.null(curUser))
+      {
+        print("User NULL")
+      }
+      
+      userData <- as.data.frame(filter(passwordData, usuario==curUser))
+      if (nrow(user) < 1)
+      {
+        print("No se encontraron registros para este usuario")
+      }
+      user[1,]
+    }
+  )
+  
   Data_ <- reactive(
     {
       if (input$region == "All")
@@ -111,7 +128,7 @@ server <- function(session, input, output)
   
   output$Messages <- renderMenu(
     {
-      messageData <- Consulta(Query = "SELECT * FROM MENSAJES")
+      messageData <- Consulta(Query = "SELECT * FROM MENSAJES", Table = "mensajes")
       msgs <- apply(messageData, 1,
                     function(row) 
                     {
