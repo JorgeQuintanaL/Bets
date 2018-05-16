@@ -55,7 +55,7 @@ server <- function(session, input, output)
       plot_geo(df2) %>%
         add_trace(z = ~Reports,
                   color = ~Reports,
-                  colors = "Blues",
+                  colors = "Reds",
                   text = ~Country_Name,
                   locations = ~Code,
                   marker = list(line = list(color = toRGB("grey"), width = 0.5))) %>%
@@ -106,6 +106,19 @@ server <- function(session, input, output)
   observe(
     {
       updateSelectInput(session = session, inputId = "pais", choices = c("All", unique(Data_()[["Country_Name"]])), selected = input$pais)
+    }
+  )
+  
+  messageData <- data.frame(From = c("Jorge", "Carlos", "Raquel"), Message = c("Hola", "Que", "Hace"))
+  output$Messages <- renderMenu(
+    {
+      msgs <- apply(messageData, 1,
+                    function(row) 
+                    {
+                      messageItem(from = row[["From"]], message = row[["Message"]])
+                    }
+      )
+      dropdownMenu(type = "messages", .list = msgs)
     }
   )
 }
