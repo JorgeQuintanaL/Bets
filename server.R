@@ -109,13 +109,13 @@ server <- function(session, input, output)
     }
   )
   
-  messageData <- data.frame(From = c("Jorge", "Carlos", "Raquel"), Message = c("Hola", "Que", "Hace"))
   output$Messages <- renderMenu(
     {
+      messageData <- Consulta(Query = "SELECT * FROM MENSAJES")
       msgs <- apply(messageData, 1,
                     function(row) 
                     {
-                      messageItem(from = row[["From"]], message = row[["Message"]])
+                      messageItem(from = row[["enviado"]], message = row[["mensaje"]])
                     }
       )
       dropdownMenu(type = "messages", .list = msgs)

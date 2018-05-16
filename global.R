@@ -6,13 +6,33 @@ library("dplyr")
 library("anytime")
 library("tidyr")
 library("ggplot2")
-library("ggmap")
 library("DT")
-
+library("plotly")
+library("RPostgreSQL")
 # setwd("~/Documents/eOddsMaker/app")
 
-# use r <- "jorge.quintana.l"
-# pwd <- "jorge.quintana.l"
+Consulta <- function(Query)
+{
+  tryCatch(
+    {
+      drv <- dbDriver("PostgreSQL")
+      MyConnection <- dbConnect(drv,
+                                dbname = "bets",
+                                host = "localhost",
+                                port = 5432,
+                                user = "postgres",
+                                password = "J0RG3qu1nt@n@")
+      
+      if (dbExistsTable(MyConnection, "mensajes"))
+      {
+        messageData <- dbGetQuery(conn = MyConnection, statement = Query)  
+      }
+      dbDisconnect(MyConnection)
+      return(messageData) 
+    }, error = function(e) {print("Error al conectarse con la base de datos.")}
+  )
+}
+
 # JSON_stream <- stream_in(gzcon(url("http://services.eoddsmaker.net/demo/feeds/V2.0/markets.ashx?l=1&u=jorge.quintana.l&p=jorge.quintana.l&bid=1,2,14,22,47,65,83,91,93,95,96,97,98,100,103,105,106,107,108,109,110,111,112,113,114,117,118,119,120,121,122,123,124,125,126,127,128,129,130&sid=50&tsmp=2018-04-23T18:00:00&frm=json")))
 
 load("JSON_stream.rda")

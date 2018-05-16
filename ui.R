@@ -1,22 +1,3 @@
-Messages <- dropdownMenu(type = "messages",
-             messageItem(
-               from = "",
-               message = "Sales are steady this month."
-             ),
-             messageItem(
-               from = "New User",
-               message = "How do I register?",
-               icon = icon("question"),
-               time = "13:45"
-             ),
-             messageItem(
-               from = "Support",
-               message = "The new server is ready.",
-               icon = icon("life-ring"),
-               time = "2014-12-01"
-             )
-)
-
 Notifications <- dropdownMenu(type = "notifications",
                               notificationItem(
                                 text = "5 new users today",
@@ -49,7 +30,7 @@ Task <- dropdownMenu(type = "tasks", badgeStatus = "success",
                      )
 )
 
-Header <- dashboardHeader(title = "Testing Data", dropdownMenuOutput("Messages"), Notifications, Task)
+Header <- dashboardHeader(title = "Testing Data", dropdownMenuOutput(outputId = "Messages"), Notifications, Task)
 Sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem(text = "Tablero de Control", tabName = "explorar", icon = icon("dashboard"),
