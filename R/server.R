@@ -3,8 +3,8 @@ server <- function(session, input, output)
   
   Data_ <- eventReactive(input$load,
     {
-      user <- "jorge.quintana.l"
-      pssw <- "jorge.quintana.l"
+      # user <- "jorge.quintana.l"
+      # pssw <- "jorge.quintana.l"
       # JSON_stream <- stream_in(
       #   gzcon(
       #     url(
@@ -15,8 +15,8 @@ server <- function(session, input, output)
       #     )
       #   )
       # )
-      load("JSON_stream.rda")
-      Regions <- read.delim(file = "Regions.csv", header = TRUE, sep = ",", dec = ".", stringsAsFactors = FALSE)
+      load("./data/JSON_stream.rda")
+      Regions <- read.delim(file = "./data/Regions.csv", header = TRUE, sep = ",", dec = ".", stringsAsFactors = FALSE)
       # register_google(key = "AIzaSyAwoxxqyumTJSm1ksS29h4sbv3eoZO7YeA")
       
       JSON_stream$S[[1]] %>%
@@ -44,7 +44,7 @@ server <- function(session, input, output)
   
   df2 <- reactive(
     {
-      df2 <- read.delim(file = "world_codes.csv", header = TRUE, sep = ",", dec = ".", stringsAsFactors = FALSE)
+      df2 <- read.delim(file = "./data/world_codes.csv", header = TRUE, sep = ",", dec = ".", stringsAsFactors = FALSE)
       WorldData <- map_data("world")
       WorldData %>% 
         filter(region != "Antarctica") -> WorldData
@@ -63,6 +63,7 @@ server <- function(session, input, output)
       Data_() %>%
         filter(Region %in% input$region) %>%
         group_by(Region, Country_Name) %>%
+        distinct(Event_ID) %>%
         summarise(Reports = n()) %>%
         ggplot(., aes(x = Country_Name, y = Reports, fill = Region)) +
         geom_bar(stat = "identity") +
@@ -79,8 +80,9 @@ server <- function(session, input, output)
   output$plot2 <- renderPlot(
     {
       Data_() %>%
-        filter(Region %in% input$region, Country_Name %in% input$pais) %>%
+        filter(Region %in% input$region, Country_Name %in% input$country) %>%
         group_by(League_Name) %>%
+        distinct(Event_ID) %>%
         summarise(Reports = n()) %>%
         top_n(10) %>%
         ggplot(., aes(x = League_Name, y = Reports, fill = League_Name)) +
@@ -98,7 +100,7 @@ server <- function(session, input, output)
   output$valueBox <- renderInfoBox(
     {
       infoBox(value = tags$p(style = "font-size: 30px;", 0),
-              title = "Participacion",
+              title = "Share",
               icon = icon("stats", lib = "glyphicon"),
               color = "green",
               fill = TRUE)
@@ -108,7 +110,7 @@ server <- function(session, input, output)
   output$progressBox <- renderInfoBox(
     {
       infoBox(value = tags$p(style = "font-size: 30px;", 0),
-              title = "Valor Invertido",
+              title = "Value Invested",
               icon = icon("ok-circle", lib = "glyphicon"),
               color = "red",
               fill = TRUE)
@@ -118,7 +120,67 @@ server <- function(session, input, output)
   output$approvalBox <- renderInfoBox(
     {
       infoBox(value = tags$p(style = "font-size: 30px;", paste0(0, "%")),
-              title = "Ganancia",
+              title = "Profit",
+              icon = icon("thumbs-up", lib = "glyphicon"),
+              color = "yellow",
+              fill = TRUE)
+    }
+  )
+  
+  output$valueBox1 <- renderInfoBox(
+    {
+      infoBox(value = tags$p(style = "font-size: 30px;", 0),
+              title = "Share",
+              icon = icon("stats", lib = "glyphicon"),
+              color = "green",
+              fill = TRUE)
+    }
+  )
+  
+  output$progressBox1 <- renderInfoBox(
+    {
+      infoBox(value = tags$p(style = "font-size: 30px;", 0),
+              title = "Value Invested",
+              icon = icon("ok-circle", lib = "glyphicon"),
+              color = "red",
+              fill = TRUE)
+    }
+  )
+  
+  output$approvalBox1 <- renderInfoBox(
+    {
+      infoBox(value = tags$p(style = "font-size: 30px;", paste0(0, "%")),
+              title = "Profit",
+              icon = icon("thumbs-up", lib = "glyphicon"),
+              color = "yellow",
+              fill = TRUE)
+    }
+  )
+  
+  output$valueBox2 <- renderInfoBox(
+    {
+      infoBox(value = tags$p(style = "font-size: 30px;", 0),
+              title = "Share",
+              icon = icon("stats", lib = "glyphicon"),
+              color = "green",
+              fill = TRUE)
+    }
+  )
+  
+  output$progressBox2 <- renderInfoBox(
+    {
+      infoBox(value = tags$p(style = "font-size: 30px;", 0),
+              title = "Value Invested",
+              icon = icon("ok-circle", lib = "glyphicon"),
+              color = "red",
+              fill = TRUE)
+    }
+  )
+  
+  output$approvalBox2 <- renderInfoBox(
+    {
+      infoBox(value = tags$p(style = "font-size: 30px;", paste0(0, "%")),
+              title = "Profit",
               icon = icon("thumbs-up", lib = "glyphicon"),
               color = "yellow",
               fill = TRUE)
@@ -134,8 +196,8 @@ server <- function(session, input, output)
                   text = ~Country_Name,
                   locations = ~Code,
                   marker = list(line = list(color = toRGB("grey"), width = 0.5))) %>%
-        colorbar(title = "Eventos") %>%
-        layout(title = "Eventos por Pais",
+        colorbar(title = "Events") %>%
+        layout(title = "Events by Country",
                geo = list(showframe = FALSE,
                           showcoastlines = TRUE,
                           showland = TRUE,
@@ -157,7 +219,7 @@ server <- function(session, input, output)
       else
       {
         index <- as.numeric(d[2]$pointNumber) + 1
-        df2[row.names(df2) == index, "Country_Name"]
+        df2()[row.names(df2()) == index, "Country_Name"]
       }
     }
   )
@@ -176,11 +238,11 @@ server <- function(session, input, output)
           filter(Country_Name %in% selected_country())
       }
     },
-    options = list(pageLength = 13, scrollX = TRUE, scrollY = "480px", columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+    options = list(pageLength = 10, scrollX = TRUE, scrollY = "430px", columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
   
   observe(
     {
-      updateSelectInput(session = session, inputId = "pais", choices = unique(Data_()[Data_()$Region %in% input$region, "Country_Name"]))
+      updateSelectInput(session = session, inputId = "country", choices = unique(Data_()[Data_()$Region %in% input$region, "Country_Name"]))
     }
   )
   
@@ -192,32 +254,26 @@ server <- function(session, input, output)
   
   observe(
     {
-      updateSelectInput(session = session, inputId = "casas", choices = Consulta(Query = "SELECT nombre_casa FROM casas WHERE incluir = 'si'", Table = "casas"))
+      updateSelectInput(session = session, inputId = "bookmarks", choices = Consulta(Query = "SELECT bookmark_name FROM bookmarks WHERE include = 'yes'", Table = "bookmarks"))
     }
   )
   
   observe(
     {
-      updateSelectInput(session = session, inputId = "sport", choices = Consulta(Query = "SELECT nombre_deporte FROM deportes", Table = "deportes"))
+      updateSelectInput(session = session, inputId = "sport", choices = Consulta(Query = "SELECT sport_name FROM sports", Table = "sports"))
     }
   )
   
   output$Messages <- renderMenu(
     {
-      messageData <- Consulta(Query = "SELECT * FROM MENSAJES", Table = "mensajes")
+      messageData <- Consulta(Query = "SELECT * FROM MESSAGES", Table = "messages")
       msgs <- apply(messageData, 1,
                     function(row) 
                     {
-                      messageItem(from = row[["enviado"]], message = row[["mensaje"]])
+                      messageItem(from = row[["sent_by"]], message = row[["message"]])
                     }
       )
       dropdownMenu(type = "messages", .list = msgs)
-    }
-  )
-  
-  output$menu <- renderMenu(
-    {
-      sidebarMenu(menuItem("Menu item", icon = icon("calendar")))
     }
   )
 }

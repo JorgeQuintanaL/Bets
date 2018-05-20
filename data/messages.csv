@@ -1,4 +1,4 @@
-id_usuario,nombre_usuario,apellido_usuario,mensaje,enviado
+user_id,user_name,user_surname,message,sent_by
 1,JORGE,QUINTANA,Bienvenid@ de nuevo,Admin
 2,CARLOS,BOLANOS,Bienvenid@ de nuevo,Admin
 3,EUEN,LOPEZ,Bienvenid@ de nuevo,Admin

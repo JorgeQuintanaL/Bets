@@ -8,7 +8,7 @@ library("tidyr")
 library("ggplot2")
 library("DT")
 library("plotly")
-# setwd("~/Documents/eOddsMaker/app")
+setwd("~/Documents/GitHub/Bets/")
 
 Consulta <- function(Query, Table)
 {

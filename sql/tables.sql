@@ -1,46 +1,46 @@
-DROP TABLE mensajes;
-CREATE TABLE mensajes
+DROP TABLE messages;
+CREATE TABLE messages
 (
-    id_usuario INT PRIMARY KEY NOT NULL,
-    nombre_usuario VARCHAR(50) NOT NULL,
-    apellido_usuario VARCHAR(50) NOT NULL,
-    mensaje VARCHAR(100),
-    enviado VARCHAR(50)
+    user_id INT PRIMARY KEY NOT NULL,
+    user_name VARCHAR(50) NOT NULL,
+    user_surname VARCHAR(50) NOT NULL,
+    message VARCHAR(100),
+    sent_by VARCHAR(50)
 );
 
-COPY mensajes FROM '/Users/jorgequintana/Documents/GitHub/Bets/mensajes.csv' DELIMITER ',' CSV HEADER;
-SELECT * FROM mensajes;
+COPY messages FROM '/Users/jorgequintana/Documents/GitHub/Bets/data/messages.csv' DELIMITER ',' CSV HEADER;
+SELECT * FROM messages;
 
-DROP TABLE public.contrasenas;
-CREATE TABLE contrasenas
+DROP TABLE passwords;
+CREATE TABLE passwords
 (
-    id_usuario INT PRIMARY KEY NOT NULL,
-    nombre_usuario VARCHAR(50) NOT NULL,
-    apellido_usuario VARCHAR(50) NOT NULL,
-    usuario VARCHAR(100),
-    contrasena VARCHAR(50)
+    user_id INT PRIMARY KEY NOT NULL,
+    user_name VARCHAR(50) NOT NULL,
+    user_surname VARCHAR(50) NOT NULL,
+    user_registered VARCHAR(100),
+    password_registered VARCHAR(50)
 );
 
-COPY contrasenas FROM '/Users/jorgequintana/Documents/GitHub/Bets/contrasenas.csv' DELIMITER ',' CSV HEADER;
-SELECT * FROM contrasenas;
+COPY passwords FROM '/Users/jorgequintana/Documents/GitHub/Bets/data/passwords.csv' DELIMITER ',' CSV HEADER;
+SELECT * FROM passwords;
 
-DROP TABLE casas;
-CREATE TABLE casas
+DROP TABLE bookmarks;
+CREATE TABLE bookmarks
 (
-    id_casa INT PRIMARY KEY NOT NULL,
-    nombre_casa VARCHAR(50) NOT NULL,
-    incluir     VARCHAR(4) NOT NULL
+    bookmark_id INT PRIMARY KEY NOT NULL,
+    bookmark_name VARCHAR(50) NOT NULL,
+    include     VARCHAR(4) NOT NULL
 );
 
-COPY public.casas FROM '/Users/jorgequintana/Documents/GitHub/Bets/casas.csv' DELIMITER ',' CSV HEADER;
-SELECT * FROM casas;
+COPY bookmarks FROM '/Users/jorgequintana/Documents/GitHub/Bets/data/bookmarks.csv' DELIMITER ',' CSV HEADER;
+SELECT * FROM bookmarks;
 
-DROP TABLE deportes;
-CREATE TABLE deportes
+DROP TABLE sports;
+CREATE TABLE sports
 (
-    id_deporte INT PRIMARY KEY NOT NULL,
-    nombre_deporte VARCHAR(50) NOT NULL
+    sport_id INT PRIMARY KEY NOT NULL,
+    sport_name VARCHAR(50) NOT NULL
 );
 
-COPY deportes FROM '/Users/jorgequintana/Documents/GitHub/Bets/deportes.csv' DELIMITER ',' CSV HEADER;
-SELECT * FROM deportes;
+COPY sports FROM '/Users/jorgequintana/Documents/GitHub/Bets/data/sports.csv' DELIMITER ',' CSV HEADER;
+SELECT * FROM sports;
