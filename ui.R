@@ -33,28 +33,49 @@ Task <- dropdownMenu(type = "tasks", badgeStatus = "success",
 Header <- dashboardHeader(title = "Testing Data", dropdownMenuOutput(outputId = "Messages"), Notifications, Task)
 Sidebar <- dashboardSidebar(
   sidebarMenu(
-    menuItem(text = "Tablero de Control", tabName = "explorar", icon = icon("dashboard"),
-             menuSubItem(text = "Filtrar los Datos", tabName = "generar_consulta", icon = icon("cloud")),
-             menuSubItem(text = "Filtrar los Datos", tabName = "frecuencias", icon = icon("chart-pie"))),
-    menuItem("Resultados", tabName = "resultados", icon = icon("th"))
+    menuItem(text = "Carga de Datos", tabName = "carga", icon = icon("cloud", lib = "glyphicon"),
+             selectInput(inputId = "sport",
+                         label = "Deporte",
+                         choices = "Seleccione un Deporte",
+                         selected = "Futbol"),
+             dateRangeInput(inputId = "daterange",
+                            label = "Fechas",
+                            start = Sys.Date() - 7,
+                            end = Sys.Date()),
+             selectInput(inputId = "casas",
+                         label = "Casa de Apuestas",
+                         choices = "Seleccione una Casa"),
+             actionButton(inputId = "load",
+                          label = "Cargar")),
+    menuItem(text = "Tablero de Control",
+             tabName = "explorar",
+             icon = icon("dashboard")),
+    menuItem("Resultados",
+             tabName = "resultados",
+             icon = icon("th"))
   )
 )
 
 Body <- dashboardBody(
   tabItems(
-    tabItem(tabName = "frecuencias",
+    tabItem(tabName = "explorar",
+            fluidRow(
+              infoBoxOutput("progressBox"),
+              infoBoxOutput("valueBox"),
+              infoBoxOutput("approvalBox")
+            ),
             fluidRow(
               box(title = "Región",
                   collapsible = TRUE,
                   solidHeader = TRUE,
                   status = "primary",
-                  selectInput(inputId = "region", label = "Región", choices = c("All", unique(Data["Region"])), selected = "All")
+                  selectInput(inputId = "region", label = "Región", choices = "Seleccione una Region")
               ),
               box(title = "País",
                   collapsible = TRUE,
                   solidHeader = TRUE,
                   status = "primary",
-                  selectInput(inputId = "pais", label = "País", choices = c("All", "A"), selected = "All")
+                  selectInput(inputId = "pais", label = "País", choices = "Seleccione un Pais")
               )
             ),
             fluidRow(
@@ -74,6 +95,17 @@ Body <- dashboardBody(
                   collapsible = TRUE,
                   status = "primary"
               )
+            )
+    ),
+    tabItem(tabName = "resultados",
+            fluidRow(
+              box(width = 12,
+                  height = 600,
+                  title = "Mapa",
+                  collapsible = TRUE,
+                  solidHeader = TRUE,
+                  status = "primary",
+                  plotlyOutput("map", height = 540))
             ),
             fluidRow(
               box(width = 12,
@@ -83,19 +115,7 @@ Body <- dashboardBody(
                   collapsible = TRUE,
                   status = "primary",
                   solidHeader = TRUE)
-            ),
-            fluidRow(
-              box(width = 12,
-                  height = 650,
-                  title = "Mapa",
-                  collapsible = TRUE,
-                  solidHeader = TRUE,
-                  status = "primary",
-                  plotlyOutput("map", height = 590))
             )
-    ),
-    tabItem(tabName = "resultados",
-            h2("Widgets tab content")
     )
   )
 )
