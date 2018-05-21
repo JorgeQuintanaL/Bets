@@ -55,7 +55,7 @@ server <- function(session, input, output)
         summarise(Reports = n()) %>%
         left_join(x = .,
                   y = df2,
-                  by = "Country_Name") -> df2  
+                  by = "Country_Name")
     }
   )
   
@@ -73,12 +73,16 @@ server <- function(session, input, output)
         add_trace(x = ~Country_Name,
                   y = ~Reports,
                   type = "bar",
-                  color = ~Region) %>%
+                  color = ~Region,
+                  text = ~paste("Region: ", Region,
+                                "<br>Country Name: ", Country_Name,
+                                "<br>Reports: ", Reports),
+                  hoverinfo = "text") %>%
         layout(title = "Reports by Region and Country",
                xaxis = list(title = ""),
                yaxis = list(title = "Reports"),
                legend = list(orientation = "h"),
-               dragmode = "select")
+               dragmode = "subset") 
     }
   )
   
@@ -93,14 +97,19 @@ server <- function(session, input, output)
         Data_() %>%
           filter(Region %in% input$region, Country_Name %in% selected_country_bar()) %>%
           group_by(League_Name) %>%
-          distinct(Event_ID) %>%
+          distinct(Event_ID, .keep_all = TRUE) %>%
           summarise(Reports = n()) %>%
           top_n(10) %>%
           plot_ly() %>%
           add_trace(x = ~League_Name,
                     y = ~Reports,
                     type = "bar",
-                    color = ~League_Name) %>%
+                    color = ~League_Name,
+                    text = ~paste("Region: ", input$region,
+                                  "<br>Country Name: ", selected_country_bar(),
+                                  "<br>League Name: ", League_Name,
+                                  "<br>Reports: ", Reports),
+                    hoverinfo = "text") %>%
           layout(title = "Reports by Country and League",
                  xaxis = list(title = ""),
                  yaxis = list(title = "Reports"),
@@ -115,19 +124,27 @@ server <- function(session, input, output)
         add_trace(z = ~Reports,
                   color = ~Reports,
                   colors = "Reds",
-                  text = ~Country_Name,
                   locations = ~Code,
-                  marker = list(line = list(color = toRGB("grey"), width = 0.5))) %>%
+                  text = ~paste("Region: ", input$region,
+                                "<br>Country Name: ", Country_Name,
+                                "<br>Reports: ", Reports),
+                  marker = list(line = list(color = toRGB("#d1d1d1"), width = 0.5))) %>%
         colorbar(title = "Events") %>%
         layout(title = "Events by Country",
-               geo = list(showframe = FALSE,
-                          showcoastlines = TRUE,
-                          showland = TRUE,
-                          landcolor = toRGB("gray85"),
-                          projection = list(type = "Mercator"),
-                          lakecolor = toRGB("white")),
-               legend = list(orientation = "h"),
-               dragmode = "select")
+               geo = list(
+                 showframe = FALSE,
+                 showcoastlines = FALSE,
+                 projection = list(type = "orthographic"),
+                 resolution = "100",
+                 showcountries = TRUE,
+                 countrycolor = "#d1d1d1",
+                 showocean = TRUE,
+                 oceancolor = "#c9d2e0",
+                 showlakes = TRUE,
+                 lakecolor = "#99c0db",
+                 showrivers = TRUE,
+                 rivercolor = "#99c0db"),
+               legend = list(orientation = "h"))
     }
   )
   
