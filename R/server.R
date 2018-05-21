@@ -1,6 +1,7 @@
 server <- function(session, input, output) 
 {
-  
+################################################################# DATA LOADING AND PROCESSING #################################################################
+###############################################################################################################################################################
   Data_ <- eventReactive(input$load,
     {
       # user <- "jorge.quintana.l"
@@ -58,45 +59,81 @@ server <- function(session, input, output)
     }
   )
   
-  output$plot1 <- renderPlot(
+########################################################################### PLOTS #############################################################################
+###############################################################################################################################################################
+  
+  output$plot1 <- renderPlotly(
     {
       Data_() %>%
         filter(Region %in% input$region) %>%
         group_by(Region, Country_Name) %>%
         distinct(Event_ID) %>%
         summarise(Reports = n()) %>%
-        ggplot(., aes(x = Country_Name, y = Reports, fill = Region)) +
-        geom_bar(stat = "identity") +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom") +
-        labs(title = "Reports by Region and Country",
-             subtitle = "Using eOddsMaker API",
-             x = "Country / Region",
-             y = "Reports",
-             caption = "") +
-        scale_colour_hue()
+        plot_ly(source = "subset") %>%
+        add_trace(x = ~Country_Name,
+                  y = ~Reports,
+                  type = "bar",
+                  color = ~Region) %>%
+        layout(title = "Reports by Region and Country",
+               xaxis = list(title = ""),
+               yaxis = list(title = "Reports"),
+               legend = list(orientation = "h"),
+               dragmode = "select")
     }
   )
   
-  output$plot2 <- renderPlot(
+  output$plot2 <- renderPlotly(
     {
-      Data_() %>%
-        filter(Region %in% input$region, Country_Name %in% input$country) %>%
-        group_by(League_Name) %>%
-        distinct(Event_ID) %>%
-        summarise(Reports = n()) %>%
-        top_n(10) %>%
-        ggplot(., aes(x = League_Name, y = Reports, fill = League_Name)) +
-        geom_bar(stat = "identity") +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom") +
-        labs(title = "Reports by Country and League",
-             subtitle = "Using eOddsMaker API",
-             x = "League",
-             y = "Reports",
-             caption = "") +
-        scale_colour_hue()
+      if (is.null(selected_country_bar()))
+      {
+        return(NULL)
+      }
+      else
+      {
+        Data_() %>%
+          filter(Region %in% input$region, Country_Name %in% selected_country_bar()) %>%
+          group_by(League_Name) %>%
+          distinct(Event_ID) %>%
+          summarise(Reports = n()) %>%
+          top_n(10) %>%
+          plot_ly() %>%
+          add_trace(x = ~League_Name,
+                    y = ~Reports,
+                    type = "bar",
+                    color = ~League_Name) %>%
+          layout(title = "Reports by Country and League",
+                 xaxis = list(title = ""),
+                 yaxis = list(title = "Reports"),
+                 legend = list(orientation = "h"))
+      }
     }
   )
   
+  output$map <- renderPlotly(
+    {
+      plot_geo(data = df2(), source = "select") %>%
+        add_trace(z = ~Reports,
+                  color = ~Reports,
+                  colors = "Reds",
+                  text = ~Country_Name,
+                  locations = ~Code,
+                  marker = list(line = list(color = toRGB("grey"), width = 0.5))) %>%
+        colorbar(title = "Events") %>%
+        layout(title = "Events by Country",
+               geo = list(showframe = FALSE,
+                          showcoastlines = TRUE,
+                          showland = TRUE,
+                          landcolor = toRGB("gray85"),
+                          projection = list(type = "Mercator"),
+                          lakecolor = toRGB("white")),
+               legend = list(orientation = "h"),
+               dragmode = "select")
+    }
+  )
+  
+#################################################################### VALUE AND INFO BOXES #####################################################################
+###############################################################################################################################################################
+
   output$valueBox <- renderInfoBox(
     {
       infoBox(value = tags$p(style = "font-size: 30px;", 0),
@@ -187,31 +224,12 @@ server <- function(session, input, output)
     }
   )
   
-  output$map <- renderPlotly(
-    {
-      plot_geo(df2()) %>%
-        add_trace(z = ~Reports,
-                  color = ~Reports,
-                  colors = "Reds",
-                  text = ~Country_Name,
-                  locations = ~Code,
-                  marker = list(line = list(color = toRGB("grey"), width = 0.5))) %>%
-        colorbar(title = "Events") %>%
-        layout(title = "Events by Country",
-               geo = list(showframe = FALSE,
-                          showcoastlines = TRUE,
-                          showland = TRUE,
-                          landcolor = toRGB("gray85"),
-                          projection = list(type = "Mercator"),
-                          lakecolor = toRGB("white")),
-               legend = list(orientation = "h"),
-               dragmode = "select")
-    }
-  )
+###################################################################### COUPLED EVENTS #########################################################################
+###############################################################################################################################################################
   
-  selected_country <- reactive(
+  selected_country_map <- reactive(
     {
-      d <- event_data("plotly_click")
+      d <- event_data("plotly_click", source = "select")
       if (is.null(d))
       {
         return(NULL)
@@ -224,21 +242,52 @@ server <- function(session, input, output)
     }
   )
   
+  selected_country_bar <- reactive(
+    {
+      d <- event_data("plotly_click", source = "subset")
+      if (is.null(d))
+      {
+        return(NULL)
+      }
+      else
+      {
+        d[["x"]]
+        # index <- as.numeric(d[2]$pointNumber) + 1
+        # df2()[df2()$Country_Name %in% input$region, row.names(df2()) == index, "Country_Name"]
+      }
+    }
+  )
+  
+######################################################################## DT TABLES ############################################################################
+###############################################################################################################################################################
+  
   output$countries <- DT::renderDataTable(
     {
-      if (is.null(selected_country()))
+      if (is.null(selected_country_map()))
       {
         Data_() %>%
-          select(Sport_Name, Country_Name, League_Name, Event_Datetime, Round, Bookies, Team1, Team2, BookMark_ID, Odd_Name, Odd_Value)
+          group_by(Country_Name, League_Name, Team1, Team2, Event_Datetime) %>%
+          summarise(Reports = n()) %>%
+          mutate(Date = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 1, 10),
+                 Hour = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 12, 19)) %>%
+          select(-Event_Datetime)
       }
       else
       {
         Data_() %>%
-          select(Sport_Name, Country_Name, League_Name, Event_Datetime, Round, Bookies, Team1, Team2, BookMark_ID, Odd_Name, Odd_Value) %>%
-          filter(Country_Name %in% selected_country())
+          group_by(Country_Name, League_Name, Team1, Team2, Event_Datetime) %>%
+          summarise(Reports = n()) %>%
+          mutate(Date = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 1, 10),
+                 Hour = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 12, 19)) %>%
+          filter(Country_Name %in% selected_country_map()) %>%
+          select(-Event_Datetime)
       }
     },
-    options = list(pageLength = 10, scrollX = TRUE, scrollY = "430px", columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+    options = list(pageLength = 12, scrollX = TRUE, scrollY = "430px", columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+  
+  
+######################################################################## OBSERVERS ############################################################################
+###############################################################################################################################################################
   
   observe(
     {
@@ -264,6 +313,8 @@ server <- function(session, input, output)
     }
   )
   
+####################################################### MESSAGES, NOTIFICATIONS AND ALERTS ####################################################################
+###############################################################################################################################################################
   output$Messages <- renderMenu(
     {
       messageData <- Consulta(Query = "SELECT * FROM MESSAGES", Table = "messages")

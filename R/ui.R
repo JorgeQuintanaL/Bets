@@ -1,3 +1,5 @@
+####################################################### MESSAGES, NOTIFICATIONS AND ALERTS ####################################################################
+###############################################################################################################################################################
 Notifications <- dropdownMenu(type = "notifications",
                               notificationItem(
                                 text = "5 new users today",
@@ -30,10 +32,16 @@ Task <- dropdownMenu(type = "tasks", badgeStatus = "success",
                      )
 )
 
+################################################################## HEADER #####################################################################################
+###############################################################################################################################################################
+
 Header <- dashboardHeader(title = "Bets App",
                           dropdownMenuOutput(outputId = "Messages"),
                           Notifications,
                           Task)
+
+################################################################## SIDEBAR ####################################################################################
+###############################################################################################################################################################
 Sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem(text = "Load Data",
@@ -63,10 +71,6 @@ Sidebar <- dashboardSidebar(
              menuSubItem(text = "By Country and League", 
                          tabName = "country_league",
                          icon = icon("globe", 
-                                     lib = "glyphicon")),
-             menuSubItem(text = "By League and Event"
-                         , tabName = "league_event",
-                         icon = icon("fire",
                                      lib = "glyphicon"))),
     menuItem("Results",
              tabName = "results",
@@ -74,6 +78,8 @@ Sidebar <- dashboardSidebar(
   )
 )
 
+####################################################################### BODY ##################################################################################
+###############################################################################################################################################################
 Body <- dashboardBody(
   tabItems(
     tabItem(tabName = "region_country",
@@ -83,45 +89,22 @@ Body <- dashboardBody(
               infoBoxOutput(outputId = "approvalBox")
             ),
             fluidRow(
-              # box(title = "Region",
-              #     collapsible = TRUE,
-              #     solidHeader = TRUE,
-              #     status = "primary",
-              #     selectInput(inputId = "region",
-              #                 label = "Region",
-              #                 choices = "Choose a Region")
-              # ),
-              # box(title = "Country",
-              #     collapsible = TRUE,
-              #     solidHeader = TRUE,
-              #     status = "primary",
-              #     selectInput(inputId = "country",
-              #                 label = "Country",
-              #                 choices = "Choose a Country")
-              # )
-            ),
-            fluidRow(
               box(width = 6,
-                  height = 600,
+                  height = 650,
                   title = "Events by Region",
                   solidHeader = TRUE,
                   selectInput(inputId = "region",
                               label = "Region",
                               choices = "Choose a Region"),
-                  br(),
-                  plotOutput("plot1"),
+                  plotlyOutput("plot1", height = 500),
                   collapsible = TRUE,
                   status = "primary"
               ),
               box(width = 6,
-                  height = 600,
+                  height = 650,
                   title = "Events by Country",
                   solidHeader = TRUE,
-                  selectInput(inputId = "country",
-                              label = "Country",
-                              choices = "Choose a Country"),
-                  br(),
-                  plotOutput("plot2"),
+                  plotlyOutput("plot2", height = 590),
                   collapsible = TRUE,
                   status = "primary"
               )
@@ -134,23 +117,14 @@ Body <- dashboardBody(
               infoBoxOutput(outputId = "approvalBox1")
             ),
             fluidRow(
-              box(width = 12,
+              box(width = 5,
                   height = 600,
                   title = "Map",
                   collapsible = TRUE,
                   solidHeader = TRUE,
                   status = "primary",
-                  plotlyOutput("map", height = 540))
-            )
-    ),
-    tabItem(tabName = "league_event",
-            fluidRow(
-              infoBoxOutput(outputId = "progressBox2"),
-              infoBoxOutput(outputId = "valueBox2"),
-              infoBoxOutput(outputId = "approvalBox2")
-            ),
-            fluidRow(
-              box(width = 12,
+                  plotlyOutput("map", height = 540)),
+              box(width = 7,
                   height = 600,
                   DTOutput(outputId = "countries"),
                   title = "Events Details",
@@ -162,4 +136,6 @@ Body <- dashboardBody(
   )
 )
 
+############################################################## DASHBOARD PAGE #################################################################################
+###############################################################################################################################################################
 dashboardPage(Header, Sidebar, Body)
