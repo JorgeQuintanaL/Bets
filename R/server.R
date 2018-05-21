@@ -76,8 +76,7 @@ server <- function(session, input, output)
                   color = ~Region,
                   text = ~paste("Region: ", Region,
                                 "<br>Country Name: ", Country_Name,
-                                "<br>Reports: ", Reports),
-                  hoverinfo = "text") %>%
+                                "<br>Reports: ", Reports)) %>%
         layout(title = "Reports by Region and Country",
                xaxis = list(title = ""),
                yaxis = list(title = "Reports"),
@@ -108,8 +107,7 @@ server <- function(session, input, output)
                     text = ~paste("Region: ", input$region,
                                   "<br>Country Name: ", selected_country_bar(),
                                   "<br>League Name: ", League_Name,
-                                  "<br>Reports: ", Reports),
-                    hoverinfo = "text") %>%
+                                  "<br>Reports: ", Reports)) %>%
           layout(title = "Reports by Country and League",
                  xaxis = list(title = ""),
                  yaxis = list(title = "Reports"),
@@ -125,8 +123,7 @@ server <- function(session, input, output)
                   color = ~Reports,
                   colors = "Reds",
                   locations = ~Code,
-                  text = ~paste("Region: ", input$region,
-                                "<br>Country Name: ", Country_Name,
+                  text = ~paste("Country Name: ", Country_Name,
                                 "<br>Reports: ", Reports),
                   marker = list(line = list(color = toRGB("#d1d1d1"), width = 0.5))) %>%
         colorbar(title = "Events") %>%
@@ -292,7 +289,7 @@ server <- function(session, input, output)
       else
       {
         Data_() %>%
-          group_by(Country_Name, League_Name, Team1, Team2, Event_Datetime) %>%
+          group_by(Country_Name, League_Name, Event_ID, Team1, Team2, Event_Datetime) %>%
           summarise(Reports = n()) %>%
           mutate(Date = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 1, 10),
                  Hour = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 12, 19)) %>%
@@ -300,7 +297,9 @@ server <- function(session, input, output)
           select(-Event_Datetime)
       }
     },
-    options = list(pageLength = 12, scrollX = TRUE, scrollY = "430px", columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+    options = list(pageLength = 12, scrollX = TRUE, scrollY = "430px", columnDefs = list(list(className = 'dt-center', targets = "_all"))),
+    rownames = FALSE,
+    selection = "single")
   
   
 ######################################################################## OBSERVERS ############################################################################
@@ -327,6 +326,36 @@ server <- function(session, input, output)
   observe(
     {
       updateSelectInput(session = session, inputId = "sport", choices = Consulta(Query = "SELECT sport_name FROM sports", Table = "sports"))
+    }
+  )
+  
+  observeEvent(
+    input$countries_rows_selected,
+    {
+      if (is.null(selected_country_map()))
+      {
+        Data_() %>%
+          group_by(Country_Name, League_Name, Event_ID, Team1, Team2, Event_Datetime) %>%
+          summarise(Reports = n()) %>%
+          mutate(Date = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 1, 10),
+                 Hour = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 12, 19)) %>%
+          select(-Event_Datetime) -> aux
+        
+        event_id <- aux[input$countries_rows_selected, "Event_ID"]
+      }
+      else
+      {
+        Data_() %>%
+          group_by(Country_Name, League_Name, Event_ID, Team1, Team2, Event_Datetime) %>%
+          summarise(Reports = n()) %>%
+          mutate(Date = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 1, 10),
+                 Hour = substr(as.POSIXct(Event_Datetime, format = "%Y-%m-%dT%H:%M:%S"), 12, 19)) %>%
+          filter(Country_Name == selected_country_map()) %>%
+          select(-Event_Datetime) -> aux
+        
+        event_id <- aux[input$countries_rows_selected, "Event_ID"]
+      }
+      
     }
   )
   

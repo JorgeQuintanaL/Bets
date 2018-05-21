@@ -44,3 +44,17 @@ CREATE TABLE sports
 
 COPY sports FROM '/Users/jorgequintana/Documents/GitHub/Bets/data/sports.csv' DELIMITER ',' CSV HEADER;
 SELECT * FROM sports;
+
+DROP TABLE bets;
+CREATE TABLE bets
+(
+    bet_id INT PRIMARY KEY NOT NULL,
+    region_name VARCHAR(50) NOT NULL,
+    country_name VARCHAR(50) NOT NULL,
+    league_name VARCHAR(50) NOT NULL,
+    event_id INT NOT NULL,
+    value INT NOT NULL
+);
+
+COPY bets FROM '/Users/jorgequintana/Documents/GitHub/Bets/data/events.csv' DELIMITER ',' CSV HEADER;
+SELECT * FROM bets;
