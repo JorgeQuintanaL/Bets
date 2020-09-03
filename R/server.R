@@ -4,8 +4,8 @@ server <- function(session, input, output)
 ###############################################################################################################################################################
   Data_ <- eventReactive(input$load,
     {
-      # user <- "jorge.quintana.l"
-      # pssw <- "jorge.quintana.l"
+      # user <- user
+      # pssw <- password
       # JSON_stream <- stream_in(
       #   gzcon(
       #     url(
