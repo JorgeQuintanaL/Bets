@@ -14,10 +14,7 @@ load("JSON_stream2.rda")
 Regions <- read.delim(file = "Regions.csv", header = TRUE, sep = ",", dec = ".", stringsAsFactors = FALSE)
 register_google(key = "AIzaSyAwoxxqyumTJSm1ksS29h4sbv3eoZO7YeA")
 
-
-# user <- "jorge.quintana.l"
-# pwd <- "jorge.quintana.l"
-# JSON_stream <- stream_in(gzcon(url("http://services.eoddsmaker.net/demo/feeds/V2.0/markets.ashx?l=1&u=jorge.quintana.l&p=jorge.quintana.l&bid=1,2,14,22,47,65,83,91,93,95,96,97,98,100,103,105,106,107,108,109,110,111,112,113,114,117,118,119,120,121,122,123,124,125,126,127,128,129,130&sid=50&tsmp=2018-04-23T18:00:00&frm=json")))
+# JSON_stream <- stream_in(gzcon(url("http://services.eoddsmaker.net/demo/feeds/V2.0/markets.ashx?l=1&u=user&p=pwd&bid=1,2,14,22,47,65,83,91,93,95,96,97,98,100,103,105,106,107,108,109,110,111,112,113,114,117,118,119,120,121,122,123,124,125,126,127,128,129,130&sid=50&tsmp=2018-04-23T18:00:00&frm=json")))
 
 ######################################################################################################################################
 
