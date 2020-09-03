@@ -18,11 +18,11 @@ Consulta <- function(Query, Table)
     {
       drv <- dbDriver("PostgreSQL")
       MyConnection <- dbConnect(drv,
-                                dbname = "bets",
-                                host = "localhost",
+                                dbname = dbname,
+                                host = host,
                                 port = 5432,
-                                user = "postgres",
-                                password = "J0RG3qu1nt@n@")
+                                user = user,
+                                password = password)
       
       if (dbExistsTable(MyConnection, Table))
       {
